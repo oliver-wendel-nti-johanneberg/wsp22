@@ -1,0 +1,29 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: blueviolet;
+}
+
+.nav_wrapper {
+    display: grid;
+    grid-template-columns: 1fr 3fr 2fr;
+    grid-template-areas: "nalo nahe nalg";
+    height: 200px;
+    width: 98.7vw;
+}
+
+#nav_logo {
+    background-color: aquamarine;
+    grid-area: nalo;
+}
+
+.nav_text {
+    background-color: lightcoral;
+    grid-area: nahe;
+}
+
+.nav_log_in {
+    background-color: indigo;
+    grid-area: nalg;
+}
