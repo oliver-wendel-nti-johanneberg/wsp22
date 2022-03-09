@@ -6,14 +6,25 @@ html lang="en"
     meta name="viewport" content="width=device-width, initial-scale=1.0"/
     meta http-equiv="X-UA-Compatible" content="ie=edge"/
     link rel="stylesheet" href="/css/style.css"/
-    title Document
+    title Stallion-1
     body 
 
-        nav.nav_wrapper 
-            section#nav_logo
-            header.nav_text
-                h1 Stallion1
-            section.nav_log_in
-
-
+      nav.nav_wrapper 
+          section#nav_logo
+            img src="img/horse.png" alt=""/
+          header.nav_text
+              h1 Stallion-1  
+          section.nav_log_in
+            form.login_nav#log_nav action="/log_in" method="POST" 
+              label for="username" username: 
+              input type="text" name="username"
+              br
+              label for="username" password: 
+              input type="text" name="password"
+              br
+              input#log_button_nav type="submit" value="Log in"
+            form.login_nav#reg_nav  action="/register" method="POST" 
+              label for="" inget konto?
+              br
+              input#reg_button_nav type="submit" value="registera dig"
     ==yield 
