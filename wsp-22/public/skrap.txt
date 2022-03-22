@@ -1,0 +1,27 @@
+            article.article_start#article_1_start 
+                h3.comp_name Göteborgs Grand Prix
+                h3.comp_date 22 februari
+            article.article_start#article_2_start 
+                table.table_start 
+                    tr
+                        td.row_1_st Vinnare 
+                        td Minny 
+                        td 5: plats 
+                        td Liam
+                    tr 
+                        td.row_1_st 2: plats
+                        td Hello
+                        td 6: plats 
+                        td Liam
+                    tr 
+                        td.row_1_st 3: plats 
+                        td Oliver
+                        td 7: plats 
+                        td Potnus
+                    tr
+                        td.row_1_st 4: plats 
+                        td Snow
+                        td 8: plats 
+                        td Liam     
+                    
+

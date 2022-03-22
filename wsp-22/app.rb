@@ -8,10 +8,10 @@ get('/') do
     db = SQLite3::Database.new("db/horse_data.db")
     db.results_as_hash = true
     r_competitions = db.execute("SELECT * FROM Competitions")
-    p result
+
     slim(:start, locals:{competitions:r_competitions})
 end
 
 get('/standings') do
-slim(:standings)
+slim(:"standings/standings")
 end
