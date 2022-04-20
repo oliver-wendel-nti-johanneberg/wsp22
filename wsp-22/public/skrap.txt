@@ -23,5 +23,68 @@
                         td Snow
                         td 8: plats 
                         td Liam     
+
+
+
+
+
+
+
+
+
+
+        table.table_start 
+            tr
+                td.row_1_st
+                    label for="winner" winner
+                td 
+                    select name="select_winner"
+                        - horse_names.each do |h_name|
+                            option value="#{h_name["name"]}"  #{h_name["name"]}  
+                td
+                    label for="5th" 5th 
+                td 
+                    select name="select_5th"
+                        - horse_names.each do |h_name|
+                            option value="#{h_name["name"]}"  #{h_name["name"]}
+            tr 
+                td.row_1_st
+                    label for="2nd" 2nd
+                td 
+                    select name="select_2nd"
+                        - horse_names.each do |h_name|
+                            option value="#{h_name["name"]}"  #{h_name["name"]}  
+                td
+                    label for="6th" 6th 
+                td 
+                    select name="select_6th"
+                        - horse_names.each do |h_name|
+                            option value="#{h_name["name"]}"  #{h_name["name"]} 
+            tr 
+                td.row_1_st
+                    label for="3rd" 3rd
+                td 
+                    select name="select_3rd"
+                        - horse_names.each do |h_name|
+                            option value="#{h_name["name"]}"  #{h_name["name"]}  
+                td
+                    label for="7th" 7th 
+                td 
+                    select name="select_7th"
+                        - horse_names.each do |h_name|
+                            option value="#{h_name["name"]}"  #{h_name["name"]} 
+            tr
+                td.row_1_st
+                    label for="2nd" 4th
+                td 
+                    select name="select_4th"
+                        - horse_names.each do |h_name|
+                            option value="#{h_name["name"]}"  #{h_name["name"]}  
+                td
+                    label for="8th" 8th 
+                td 
+                    select name="select_8th"
+                        - horse_names.each do |h_name|
+                            option value="#{h_name["name"]}"  #{h_name["name"]}  
                     
 

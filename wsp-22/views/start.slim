@@ -6,100 +6,143 @@ main.main_wrapper_start
         h3 Antal hästar: 2
         p se detaljer 
     section.section_start#section_lcomp_start 
-        h2 Senaste tävlingen: Stockholm 
+        - s_comp = competitions.last
+        h2 Senaste tävlingen: #{s_comp["name"]}
         table.table_start 
             tr
                 td.row_1_st Vinnare:  
-                td Minny
+                td #{s_comp["winner"]}
                 td 25 pts
             tr 
                 td.row_1_st 2: plats  
-                td Snow
-                td 18 pts
+                td #{s_comp["p2"]}
+                td 15 pts
             tr 
                 td.row_1_st 3: plats
-                td Shadow
-                td 13 pts                
+                td #{s_comp["p3"]}
+                td 10 pts                
     section.section_start#section_stando_start 
         h2 Ställning Mästerskap Ägare 
         table.table_start 
-            tr
-                td.row_1_st 1: plats  
-                td John
-                td 126 pts
-            tr 
-                td.row_1_st 2: plats  
-                td Lindy
-                td 103 pts
-            tr 
-                td.row_1_st 3: plats
-                td Shadow
-                td 58 pts    
+            - standing_owners.each do |so|
+                tr
+                    td.row_1_st #{so["norank"]}: plats
+                    td #{so["username"]}
+                    td #{so["points"]} pts
     section.section_start#section_standh_start 
         h2 Ställning Mästerskap Hästar
         table.table_start 
-            tr
-                td.row_1_st 1: plats 
-                td Minny
-                td 75 pts
-            tr 
-                td.row_1_st 2: plats  
-                td Shadow
-                td 67 pts
-            tr 
-                td.row_1_st 3: plats
-                td Snow
-                td 53 pts  
+            - standing_horses.each do |sh|
+                tr
+                    td.row_1_st #{sh["norank"]}: plats
+                    td #{sh["name"]}
+                    td #{sh["points"]} pts
+            / tr 
+            /     td.row_1_st 2: plats  
+            /     td Shadow
+            /     td 67 pts
+            / tr 
+            /     td.row_1_st 3: plats
+            /     td Snow
+            /     td 53 pts  
 - competitions.each do |comp|  
         section.section_start#section_comp_start 
             article.article_start#article_1_start 
                 h3.comp_name #{comp["name"]}
                 h3.comp_date #{comp["date"]}
+                div.comp_div
+                    form method="post" action="competitions/#{comp['id']}/delete"
+                        input type="submit" value="Ta bort"
+                    form method="get" action="competitions/#{comp['id']}/edit"
+                        input type="submit" value="Uppdatera"
             article.article_start#article_2_start 
                 table.table_start 
                     tr
                         td.row_1_st Vinnare 
                         td #{comp["winner"]} 
                         td 5: plats 
-                        td #{comp["5th_p"]}
+                        td #{comp["p5"]}
                     tr 
                         td.row_1_st 2: plats
-                        td #{comp["2nd_p"]} 
+                        td #{comp["p2"]} 
                         td 6: plats 
-                        td #{comp["6th_p"]} 
+                        td #{comp["p6"]} 
                     tr 
                         td.row_1_st 3: plats 
-                        td #{comp["3rd_p"]}
+                        td #{comp["p3"]}
                         td 7: plats 
-                        td #{comp["7th_p"]}
+                        td #{comp["p7"]}
                     tr
                         td.row_1_st 4: plats 
-                        td #{comp["4th_p"]}
+                        td #{comp["p4"]}
                         td 8: plats 
-                        td #{comp["8th_p"]} 
-section.section_start#section_comp_form_start 
-    h2#comp_form_start_h2 Tävlings administaration 
-    form action="/start/new" method="post"
-        input type="submit" value="Lägg till tävling" 
-        label for="place" Plats: 
-        input type="text"
-        label for="date_comp" Datum: 
-        input type="date" name="date_comp"
-        label for="winner"
-        select name="select_winner" size="3"
-            option value="Minny" Minny
-            option value="Sky" Sky
-            option value="Snow" Snow   
-        label for="2nd" 
-        label for="3rd" 
-        label for="5th" 
-        label for="6th"
-        label for="7th"
-        label for="8th"
-
-
-    / article.article_start#article_1_form_start 
-    / article.article_start#article_2_form_start     
+                        td #{comp["p8"]} 
+section 
+    form#section_comp_form_start action="competitions/new" method="post"
+        article.article_start#article_1_form_start
+            h2#comp_form_start_h2 Tävlings administaration
+            div#div_input
+                input type="submit" value="Lägg till tävling"
+            div#comp_form_div_1.comp_form_div
+                label for="place" Plats:   
+                input type="text" name="place_comp"
+            div#comp_form_div_2.comp_form_div
+                label for="date_comp" Datum: 
+                input type="text" name="date_comp"
+        article.article_start#article_2_form_start 
+            table#table_form_start.table_start 
+                tr
+                    td.row_1_st
+                        label for="winner" Vinnare
+                    td 
+                        select name="select_winner"
+                            - horse_names.each do |h_name|
+                                option value="#{h_name["name"]}"  #{h_name["name"]}  
+                    td
+                        label for="s5" 5: plats 
+                    td 
+                        select name="select_5th"
+                            - horse_names.each do |h_name|
+                                option value="#{h_name["name"]}"  #{h_name["name"]}
+                tr 
+                    td.row_1_st
+                        label for="s2" 2: plats
+                    td 
+                        select name="select_2nd"
+                            - horse_names.each do |h_name|
+                                option value="#{h_name["name"]}"  #{h_name["name"]}  
+                    td
+                        label for="s6" 6: plats  
+                    td 
+                        select name="select_6th"
+                            - horse_names.each do |h_name|
+                                option value="#{h_name["name"]}"  #{h_name["name"]} 
+                tr 
+                    td.row_1_st
+                        label for="s3"  3: plats
+                    td 
+                        select name="select_3rd"
+                            - horse_names.each do |h_name|
+                                option value="#{h_name["name"]}"  #{h_name["name"]}  
+                    td
+                        label for="s7" 7: plats
+                    td 
+                        select name="select_7th"
+                            - horse_names.each do |h_name|
+                                option value="#{h_name["name"]}"  #{h_name["name"]} 
+                tr
+                    td.row_1_st
+                        label for="s2" 4: plats 
+                    td 
+                        select name="select_4th"
+                            - horse_names.each do |h_name|
+                                option value="#{h_name["name"]}"  #{h_name["name"]}  
+                    td
+                        label for="s8" 8: plats 
+                    td 
+                        select name="select_8th"
+                            - horse_names.each do |h_name|
+                                option value="#{h_name["name"]}"  #{h_name["name"]}  
 
 
 
