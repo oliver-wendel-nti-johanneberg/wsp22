@@ -4,7 +4,7 @@ main.main_wrapper_start
         h3 Namn: Oliver
         h3 Ranking: 6
         h3 Antal hästar: 2
-        p se detaljer 
+        a.start_button href="/user" se ställning 
     section.section_start#section_lcomp_start 
         - s_comp = competitions.last
         h2 Senaste tävlingen: #{s_comp["name"]}
@@ -20,7 +20,7 @@ main.main_wrapper_start
             tr 
                 td.row_1_st 3: plats
                 td #{s_comp["p3"]}
-                td 10 pts                
+                td 10 pts             
     section.section_start#section_stando_start 
         h2 Ställning Mästerskap Ägare 
         table.table_start 
@@ -29,6 +29,7 @@ main.main_wrapper_start
                     td.row_1_st #{so["norank"]}: plats
                     td #{so["username"]}
                     td #{so["points"]} pts
+        a.start_button href="/standings" se ställning   
     section.section_start#section_standh_start 
         h2 Ställning Mästerskap Hästar
         table.table_start 
@@ -37,14 +38,8 @@ main.main_wrapper_start
                     td.row_1_st #{sh["norank"]}: plats
                     td #{sh["name"]}
                     td #{sh["points"]} pts
-            / tr 
-            /     td.row_1_st 2: plats  
-            /     td Shadow
-            /     td 67 pts
-            / tr 
-            /     td.row_1_st 3: plats
-            /     td Snow
-            /     td 53 pts  
+        a.start_button href="/standings" se ställning 
+            
 - competitions.each do |comp|  
         section.section_start#section_comp_start 
             article.article_start#article_1_start 

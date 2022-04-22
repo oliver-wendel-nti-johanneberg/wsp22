@@ -33,9 +33,20 @@
     margin-top: 25px;
 }
 
+#inlogged {
+    text-align: center;
+    width: 100%;
+}
+
+#inlogged h2 {
+    font-size: 18px;
+    font-style: bold;
+}
+
 .nav_log_in {
     grid-area: nalg;
     background-color: whitesmoke;
+    width: auto;
     display: flex;
     flex-direction: row;
     border: solid black 4px;
@@ -44,12 +55,19 @@
 .login_nav {
     padding: 5px;
     border-radius: 0%;
+    overflow: hidden;
 }
 
 .login_nav input {
     margin-top: 2px;
     margin-bottom: 2px;
+    clear: both;
     width: auto;
+
+}
+
+#label_2 {
+    margin-right: 43px;
 }
 
 #log_button_nav {
@@ -107,16 +125,27 @@
     font-size: 25px;
 }
 
-#section_profile_start p{
+.start_button {
     font-size: 18px;
     border: solid black 2px;
-    border-radius: 10%;
+    border-radius: 6px;
     font-weight: bold;
     text-align: center;
     width: 100px;
-    margin-left: auto;
-    margin-right: 20px;
+    margin-left: 480px;
+    margin-right: auto;
+    margin-top: 0px;
     background-color: #ddd;
+    color: black;
+    text-decoration: none;
+}
+
+.start_button:hover {
+    background-color: darkgray;
+}
+
+#error_button {
+    margin-left: 10px;
 }
 
 #section_lcomp_start {

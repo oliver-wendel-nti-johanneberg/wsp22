@@ -15,16 +15,23 @@ html lang="en"
           header.nav_text
               h1 Stallion-One  
           section.nav_log_in
-            form.login_nav#log_nav action="/log_in" method="POST" 
-              label for="username" username: 
-              input type="text" name="username"
-              br
-              label for="username" password: 
-              input type="text" name="password"
-              br
-              input#log_button_nav type="submit" value="Log in"
-            form.login_nav#reg_nav  action="/register" method="POST" 
-              label for="" inget konto?
-              br
-              input#reg_button_nav type="submit" value="registera dig"
+            - if session["role"] == 1 or session["role"] == 2
+              form.login_nav#inlogged action="/log_out" method="POST"
+                h2 Du är inloggad som:
+                h2 = session[:username]
+                input type="submit" value="Logga ut"
+            - else 
+              form.login_nav#log_nav action="/log_in" method="POST" 
+                label for="username" användarnamn: 
+                input type="text" name="username"
+                br
+                label#label_2 for="password" lösenord: 
+                input type="text" name="password"
+                br
+                input#log_button_nav type="submit" value="Logga in"
+              form.login_nav#reg_nav action="/register" method="get" 
+                label for="" inget konto?
+                br
+                input#reg_button_nav type="submit" value="registera dig"
+          
     ==yield 
