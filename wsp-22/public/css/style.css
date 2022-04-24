@@ -1,9 +1,15 @@
+/* Generellt */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box; 
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
+
+
+
+/* Nav/Layout */
 
 .nav_wrapper {
     display: grid;
@@ -14,8 +20,13 @@
 }
 
 #nav_logo {
-    background-color: aquamarine;
+    background-color: whitesmoke;
     grid-area: nalo;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 2px solid black;
+    border-right: 2px solid black;
 }
 
 #nav_logo img {
@@ -24,9 +35,10 @@
 }
 
 .nav_text {
-    background-color: lightcoral;
+    background-color: whitesmoke;
     grid-area: nahe;
     text-align: center;
+    border-bottom: 2px black solid;
 }
 
 .nav_text h1 {
@@ -49,7 +61,7 @@
     width: auto;
     display: flex;
     flex-direction: row;
-    border: solid black 4px;
+    border: 2px black solid;
 }
 
 .login_nav {
@@ -87,8 +99,16 @@
     width: fill;
     padding-top: 25px;
     padding-left: fill;
-    border-left: solid black 4px;
+    border-left: solid black 2px;
 }
+
+
+
+
+
+
+
+/* Start */
 
 .main_wrapper_start {
     display: grid;
@@ -282,6 +302,7 @@
     font-size: 35px;
 }
 
+
 #comp_form_div_1 {
     grid-area: afd1;
 }
@@ -308,47 +329,228 @@
 
 
 
-
+/* Standings */
 
 .main_wrapper_stand {
     display: grid;
-    grid-template-columns: 5fr 40px 40px 5fr;
+    grid-template-columns: 5fr 100px 100px 5fr;
     grid-template-rows: 80px 500px;
     grid-template-areas: 
-    "sth1 star star sth2"
+    "sth1 stfo stfo sth2"
     "sts1 sts1 sts2 sts2"
     ;
     height: auto;
     width: 100%;
-    margin-top:8px;
+}
+
+.header_stand {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    border-bottom: 2px red solid;
+    color: aliceblue;
+    background-color: darkgray;
 }
 
 #header_1_stand {
     grid-area: sth1;
-    background-color: aquamarine;
+}
+
+.finish_season {
+    border-bottom: red 2px solid;
+    background-color: darkgray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-area: stfo;
+}
+
+.finish_season form input {
+    font-size: 25px;
 }
 
 #header_2_stand {
     grid-area: sth2;
-    background-color: lightcyan;
-}
-
-#comp_l_stand {
-    grid-area: star;
-    background-color: lightgray;
 }
 
 .stand_owners {
     grid-area: sts1;
-    background-color: lightcoral;
-    padding-right: 20px;
 }
 
 .stand_horses {
-    grid-area: sts2;
-    background-color: lightgoldenrodyellow;
-    padding-left: 20px;
+    grid-area: sts2;    
+}
+
+.first_row_cell {
+    border-bottom: black 3px solid;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#win_cell img {
+    height: 30px;
+    width: auto;
+}
+
+.table_stand {
+    width: 100%;
+    text-align: center;
+    height: auto;
+    font-size: 16px;
+    background-color: rgb(240, 240, 240);
+}
+
+.table_stand tr td {
+    border: rgb(227, 227, 227) 2px solid;
+    background-color: lightgray;
+    height: 50px;
+}
+
+#first_stand_row_cell {
+    font-size: 20px;
+    font-weight: bold;
 }
 
 
+/* User */
 
+#main_wrapper_user {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 350px 100px 180px 180px;
+    grid-template-areas: 
+    "s1a1 s1a2"
+    "head head"
+    "s2a1 s2a2"
+    "s2a3 s2a4"
+    ;
+    height: auto;
+    width: 100%;
+}
+
+.user_stats {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 30px;
+    border-bottom: 3px solid black;
+}
+
+#user_stats_1 {
+    padding-top: 15px;
+    grid-area: s1a1;
+    background-color: rgb(215, 247, 247);
+}
+
+#user_stats_2 {
+    grid-area: s1a2;
+    background-color: rgb(199, 231, 220);
+}
+
+.article_1_user {
+    font-size: 30px;
+    margin-top: 20px;
+}
+
+.article_2_user {
+    margin-top: 20px;
+    font-size: 28px;
+}
+
+.user_stats h2 {
+    font-weight: bold;
+    font-size: 30px;
+    margin-bottom: 10px;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.header_user {
+    grid-area: head;
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+    padding-top: 15px;
+
+}
+
+.horse_stats {
+    border: 2px solid black;
+    border-radius: 5px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 120px 30px;
+    grid-template-areas: 
+    "d1 d2"
+    "fo d2"
+    ;
+    height: auto;
+    width: 100%;
+    padding: 10px;
+}
+
+.horse_stats_1 {
+    grid-area: d1;
+}
+
+.input_horse {
+    grid-area: fo;
+}
+
+.input_horse {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.input_horse form input {
+    margin-right: 10px;
+}
+
+.horse_stats_2 {
+    grid-area: d2;
+}
+
+.horse_form {
+    border: 2px solid black;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.horse_form form input {
+    width: auto;
+    height: auto;
+    font-size: 26px;
+}
+
+#horse_stats_1 {
+    grid-area: s2a1; 
+}
+
+#horse_stats_2 {
+    grid-area: s2a2; 
+}
+
+#horse_stats_3 {
+    grid-area: s2a3; 
+}
+
+#horse_stats_4 {
+    grid-area: s2a4; 
+}
+
+.change_horse{
+    padding: 10px;
+}
+
+.change_horse input{
+    margin-top: 10px;
+    text-align: center;
+}

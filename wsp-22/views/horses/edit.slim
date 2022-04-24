@@ -1,0 +1,10 @@
+- horse.each do |horse|
+    article.horse_form#horse_stats_1.change_horse
+        form#section_comp_form_horse action="/horses/#{horse['id']}/update" method="post"
+            label for="name_horse" Namn Häst:   
+            input type="text" name="name_horse" value="#{horse["name"]}"
+            label for="weight_horse" Vikt (kg):   
+            input type="text" name="weight_horse"value="#{horse["weight"]}"
+            label for="height_horse" Höjd (cm):   
+            input type="text" name="height_horse" value="#{horse["height"]}"
+            input type="submit" value="Uppdatera Häst"

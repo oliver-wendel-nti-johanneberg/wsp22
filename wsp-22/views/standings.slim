@@ -1,0 +1,41 @@
+main.main_wrapper_stand 
+    header.header_stand#header_1_stand
+        h2 Mästerskap Ägare
+    div.finish_season
+        - if session["role"] == 2
+            form action="competitions/end_season" method="post"
+                input type="submit" value="Avsluta säsong"
+    header.header_stand#header_2_stand
+        h2 Mästerskap Hästar
+    section.stand_owners
+        table.table_stand 
+            tr.first_row
+                td.first_row_cell#empty 
+                td.first_row_cell#norank_cell Placering
+                td.first_row_cell#pts_cell Poäng
+                td.first_row_cell#win_cell
+                    img src="img/gold_medal.png" alt="Bild på medalj"
+                td.first_row_cell#loss_cell Förluster
+            - o_stand.each do |owner|
+                tr.stand_row 
+                    td.stand_row_cell#first_stand_row_cell #{owner["username"]}
+                    td.stand_row_cell #{owner["norank"]}
+                    td.stand_row_cell #{owner["points"]}
+                    td.stand_row_cell #{owner["wins"]}
+                    td.stand_row_cell #{owner["losses"]}
+    section.stand_horses
+        table.table_stand 
+            tr.first_row
+                td.first_row_cell#empty 
+                td.first_row_cell#norank_cell Placering
+                td.first_row_cell#pts_cell Poäng
+                td.first_row_cell#win_cell
+                    img src="img/gold_medal.png" alt="Bild på medalj"
+                td.first_row_cell#loss_cell Förluster
+            - h_stand.each do |horse|
+                tr.stand_row 
+                    td.stand_row_cell#first_stand_row_cell #{horse["name"]}
+                    td.stand_row_cell #{horse["norank"]}
+                    td.stand_row_cell #{horse["points"]}
+                    td.stand_row_cell #{horse["wins"]}
+                    td.stand_row_cell #{horse["losses"]}

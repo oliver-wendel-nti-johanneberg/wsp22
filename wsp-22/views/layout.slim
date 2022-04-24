@@ -11,15 +11,21 @@ html lang="en"
 
       nav.nav_wrapper 
           section#nav_logo
-            img src="img/horse.png" alt=""/
+            a href="/" 
+              img src="img/horse.png" alt=""/
           header.nav_text
               h1 Stallion-One  
           section.nav_log_in
             - if session["role"] == 1 or session["role"] == 2
               form.login_nav#inlogged action="/log_out" method="POST"
-                h2 Du är inloggad som:
-                h2 = session[:username]
-                input type="submit" value="Logga ut"
+                - if session["role"] == 2
+                  h2 Du är inloggad som ADMIN
+                  h2 konto: #{session[:username]}
+                  input type="submit" value="Logga ut"
+                - else
+                  h2 Du är inloggad som:
+                  h2 = session[:username]
+                  input type="submit" value="Logga ut"
             - else 
               form.login_nav#log_nav action="/log_in" method="POST" 
                 label for="username" användarnamn: 

@@ -1,11 +1,112 @@
-section.section_user#section_user_log
-    article.user_stats#user_stats_1 
-        h3 User 
+main#main_wrapper_user
+    article.user_stats#user_stats_1
+        - user = user_result
+        - total_wins = twins
+        - p total_losses = tlosses
+        h3.article_1_user Användare: #{user["username"]}
+        h3.article_1_user Antal hästar: #{user["n_horses"]}
+        h3.article_1_user Titlar: #{user["titles"]}
+        h3.article_1_user Totala vinster: #{total_wins}
+        h3.article_1_user Totala förluster: #{total_losses}
     article.user_stats#user_stats_2 
-header.header_user 
-section.section_user#section_horses
-    article.horse_stats#horse_stats_1 
-    article.horse_stats#horse_stats_2 
-    article.horse_stats#horse_stats_3 
-    article.horse_stats#horse_stats_4  
+        - p season = season_r
+        h2 Nuvarande Säsong
+        h3.article_2_user Vinster: #{season["wins"]}
+        h3.article_2_user Förluster: #{season["t_losses"]}
+        h3.article_2_user Poäng säsong: #{season["t_points"]}
+        h3.article_2_user Ranking: #{season["norank"]}:plats
+    header.header_user 
+        h2 Mina hästar
+    - if user["n_horses"] > 0
+        - horse_1 = horse_result[0]
+        article.horse_stats#horse_stats_1
+            div.horse_stats_1
+                h2 = horse_1["name"]
+                h3 #{horse_1["weight"]} kg
+                h3 #{horse_1["height"]} cm
+                h3 Mästerskap: #{horse_1["titles"]}
+            div.input_horse
+                form method="post" action="horses/#{horse_1['id']}/delete"
+                    input type="submit" value="Ta bort"
+                form method="get" action="horses/#{horse_1['id']}/edit"
+                    input type="submit" value="Uppdatera"
+            div.horse_stats_2
+                h2 Aktuell säsong
+                h3 Vinster: #{horse_1["wins"]}
+                h3 Förluster: #{horse_1["losses"]}
+                h3 Poäng: #{horse_1["points"]}
+                h3 Ranking: #{horse_1["norank"]}
+    - else 
+        article.horse_form#horse_stats_1
+            form#section_comp_form_horse action="horses/new" method="get"
+                input type="submit" value="Lägg till Häst"
+    - if user["n_horses"] > 1
+        - horse_2 = horse_result[1]
+        article.horse_stats#horse_stats_2
+            div.horse_stats_1
+                h2 = horse_2["name"]
+                h3 #{horse_2["weight"]} kg
+                h3 #{horse_2["height"]} cm
+                h3 Mästerskap: #{horse_2["titles"]}
+            div.input_horse
+                form method="post" action="horses/#{horse_2['id']}/delete"
+                    input type="submit" value="Ta bort"
+                form method="get" action="horses/#{horse_2['id']}/edit"
+                    input type="submit" value="Uppdatera"
+            div.horse_stats_2
+                h2 Aktuell säsong
+                h3 Vinster: #{horse_2["wins"]}
+                h3 Förluster: #{horse_2["losses"]}
+                h3 Poäng: #{horse_2["points"]}
+                h3 Ranking: #{horse_2["norank"]}
+    - else 
+        article.horse_form#horse_stats_2
+            form#section_comp_form_horse action="horses/new" method="get"
+                input type="submit" value="Lägg till Häst"
+    - if user["n_horses"] > 2
+        - p horse_3 = horse_result[2]
+        article.horse_stats#horse_stats_3
+            div.horse_stats_1
+                h2 = horse_3["name"]
+                h3 #{horse_3["weight"]} kg
+                h3 #{horse_3["height"]} cm
+                h3 Mästerskap: #{horse_3["titles"]}
+            div.input_horse
+                form method="post" action="horses/#{horse_3['id']}/delete"
+                    input type="submit" value="Ta bort"
+                form method="get" action="horses/#{horse_3['id']}/edit"
+                    input type="submit" value="Uppdatera"
+            div.horse_stats_2
+                h2 Aktuell säsong
+                h3 Vinster: #{horse_3["wins"]}
+                h3 Förluster: #{horse_3["losses"]}
+                h3 Poäng: #{horse_3["points"]}
+                h3 Ranking: #{horse_3["norank"]}
+    - else 
+        article.horse_form#horse_stats_3
+            form#section_comp_form_horse action="horses/new" method="get"
+                input type="submit" value="Lägg till Häst"
+    - if user["n_horses"] > 3
+        - horse_4 = horse_result[3]
+        article.horse_stats#horse_stats_4
+            div.horse_stats_1
+                h2 = horse_4["name"]
+                h3 #{horse_4["weight"]} kg
+                h3 #{horse_4["height"]} cm
+                h3 Mästerskap: #{horse_4["titles"]}
+            div.input_horse
+                form method="post" action="horses/#{horse_4['id']}/delete"
+                    input type="submit" value="Ta bort"
+                form method="get" action="horses/#{horse_4['id']}/edit"
+                    input type="submit" value="Uppdatera"
+            div.horse_stats_2
+                h2 Aktuell säsong
+                h3 Vinster: #{horse_4["wins"]}
+                h3 Förluster: #{horse_4["losses"]}
+                h3 Poäng: #{horse_4["points"]}
+                h3 Ranking: #{horse_4["norank"]}
+    - else 
+        article.horse_form#horse_stats_4
+            form#section_comp_form_horse action="horses/new" method="get"
+                input type="submit" value="Lägg till Häst"
 
