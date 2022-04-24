@@ -297,6 +297,7 @@ get('/user') do
             while j >= 0
                 if  horse_info[i]["id"] == horse_results[j]["id"]
                     horse_exists = true
+                    p "är här"
                 end
                 j -= 1
             end
@@ -381,6 +382,7 @@ post('/user/new') do
     if check_result.empty?
         if password == password_confirm
             password_digest = BCrypt::Password.create(password)
+            p password_digest
             check_result = db.execute("INSERT INTO User (username, password, role, t_wins, t_losses, titles) VALUES (?,?,?,?,?,?)", username, password_digest, role, t_wins, t_losses, titles)
             session[:error_messege] = username
             redirect('/register_confirm')
@@ -417,6 +419,15 @@ post('/horses/new') do
     redirect('/user')
 end
 
+before('/horses/:id/delete') do
+    db = connect_db("db/horse_data.db")
+    horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
+    if session[:user_id] != horse_owner
+        session[:error_messege] = "Du äger inte denna hästen"
+        redirect('/error')
+    end
+end
+
 post('/horses/:id/delete') do
     id = params[:id].to_i
     db = connect_db("db/horse_data.db")
@@ -424,12 +435,30 @@ post('/horses/:id/delete') do
     redirect('/user')
 end
 
+# before('/horses/:id/edit') do
+    # db = connect_db("db/horse_data.db")
+    # horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
+    # if session[:user_id] != horse_owner
+    #     session[:error_messege] = "Du äger inte denna hästen"
+    #     redirect('/error')
+    # end
+# end
+
 get('/horses/:id/edit') do
     id = params[:id].to_i
     db = connect_db("db/horse_data.db")
     h_result = db.execute("SELECT * FROM Horses WHERE id = ?", id)
     slim(:"/horses/edit",locals:{horse:h_result})
 end
+
+# before('/horses/:id/update') do
+    # db = connect_db("db/horse_data.db")
+    # horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
+    # if session[:user_id] != horse_owner
+    #     session[:error_messege] = "Du äger inte denna hästen"
+    #     redirect('/error')
+    # end
+# end
 
 post('/horses/:id/update') do
     id = params[:id]
@@ -514,7 +543,4 @@ post('/log_out') do
     session.destroy
     redirect("/")
 end
-
-
-
 
