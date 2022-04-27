@@ -8,48 +8,24 @@ enable :sessions
 
 include Model
 
-helpers do 
-
-    def users_f
-        db = connect_db("db/horse_data.db")
-        db.results_as_hash = true
-        result = db.execute("SELECT * FROM User")
-        return result
-    end
-
-    def horses_f
-        db = connect_db("db/horse_data.db")
-        db.results_as_hash = true
-        result = db.execute("SELECT * FROM Horses")
-        return result
-    end
-
-    def competitions_f
-        db = connect_db("db/horse_data.db")
-        db.results_as_hash = true
-        result = db.execute("SELECT * FROM Competitions")
-        return result
-    end
-
-    def error
-        return session[:error_messege]
-    end
-end
-
+# Checks if user is logged in (Has role admin(2) or role owner(1)). If user is not logged in an error messege is displayed if user tries to request a route not specified below.
 before do 
-
-if (session[:role] != 1 && session[:role] != 2) && request.path_info != ('/') && request.path_info != ('/standings') && request.path_info != ('/error') && request.path_info != ('/register') && request.path_info != ('/log_in') && request.path_info != ('/user/new') && request.path_info != ('/register_confirm')
-session[:error_messege] = "Du har inte behörighet till denna sidan"
-redirect('/error')
-end
-    
+    if (session[:role] != 1 && session[:role] != 2) && request.path_info != ('/') && request.path_info != ('/standings') && request.path_info != ('/error') && request.path_info != ('/register') && request.path_info != ('/log_in') && request.path_info != ('/user/new') && request.path_info != ('/register_confirm')
+    session[:error_messege] = "Du har inte behörighet till denna sidan"
+    redirect('/error')
+    end
 end
 
+
+# Displays start page, and all competitions, if user is admin the (/competitions/new) form is displayed 
+#
+# @see Model#competitions_f
+# @see Model#horses_f
+# @see Model#connect_db
 get('/') do
     db = connect_db("db/horse_data.db")
     r_competitions = competitions_f
     if r_competitions.empty?
-        p "Här inne"
         db = SQLite3::Database.new("db/horse_data.db")
         db.results_as_hash = true
         horses = horses_f
@@ -66,7 +42,6 @@ get('/') do
         db.execute("INSERT INTO Competitions (name, date, winner, p2, p3, p4, p5, p6, p7, p8) VALUES (?,?,?,?,?,?,?,?,?,?)", name, date, winner, p2, p3, p4, p5, p6, p7, p8)
         db.results_as_hash = false
         comp_r = db.execute("SELECT id, winner, p2, p3, p4, p5, p6, p7, p8 FROM Competitions WHERE id = (SELECT MAX (id) FROM Competitions)")
-        p comp_r[0].length
         x = 1
         while x < comp_r[0].length
             horse_id = db.execute("SELECT id FROM Horses WHERE name = ?", comp_r[0][x])
@@ -91,16 +66,20 @@ get('/') do
         }
         session[:ranking] = 0
         session[:n_horses] = 0
-        p "här"
     end
 
     r_competitions = competitions_f
     h_names = db.execute("SELECT name FROM Horses")
     v_standingHorses = db.execute("SELECT * FROM v_StandingsHorses LIMIT 3;")
-    v_standingOwners = db.execute("SELECT * FROM v_StandingsOwners")
+    v_standingOwners = db.execute("SELECT * FROM v_StandingsOwners LIMIT 3;")
     slim(:start, locals:{competitions:r_competitions, horse_names:h_names, standing_horses:v_standingHorses, standing_owners:v_standingOwners, user:r_user})
 end
 
+
+# Checks if user is admin and if any fields in the form is empty if so an error messege is displayed.
+#
+# @param [String] place_comp, The place/name of the competition
+# @param [String] date_comp, The specified date of the competition  
 before('/competitions/new') do
     if session[:role] != 2 
         session[:error_messege] = "Du har inte behörighet för att göra detta"
@@ -112,6 +91,19 @@ before('/competitions/new') do
     end
 end
 
+
+# Creates a new competition and redirects to '/'
+#
+# @param [String] place_comp, The place/name of the competition
+# @param [String] date_comp, The specified date of the competition  
+# @param [String] select_winner, The name of the horse that was selected as the winner 
+# @param [String] select_2nd, The name of the horse that was selected as coming 2nd
+# @param [String] select_3nd, The name of the horse that was selected as coming 3rd
+# @param [String] select_4nd, The name of the horse that was selected as coming 4th
+# @param [String] select_5nd, The name of the horse that was selected as coming 5th
+# @param [String] select_6nd, The name of the horse that was selected as coming 6th
+# @param [String] select_7nd, The name of the horse that was selected as coming 7th
+# @param [String] select_8nd, The name of the horse that was selected as coming 8th
 post('/competitions/new') do
     place = params[:place_comp]
     date = params[:date_comp]
@@ -127,8 +119,6 @@ post('/competitions/new') do
     db.results_as_hash = false
     db.execute("INSERT INTO Competitions (name, date, winner, p2, p3, p4, p5, p6, p7, p8) VALUES (?,?,?,?,?,?,?,?,?,?)", place, date, winner, select_2nd, select_3rd, select_4th, select_5th, select_6th, select_7th, select_8th)
     comp_r = db.execute("SELECT id, winner, p2, p3, p4, p5, p6, p7, p8 FROM Competitions WHERE id = (SELECT MAX (id) FROM Competitions)")
-    p comp_r
-    p comp_r[0].length
     x = 1
     while x < comp_r[0].length
         horse_id = db.execute("SELECT id FROM Horses WHERE name = ?", comp_r[0][x])
@@ -147,6 +137,8 @@ post('/competitions/new') do
     redirect('/')
 end
 
+
+# Checks if user is admin otherwise redirects to '/error' and displays a specified error messege
 before('/competitions/:id/delete') do
     if session[:role] != 2 
         session[:error_messege] = "Du har inte behörighet för att göra detta"
@@ -154,6 +146,9 @@ before('/competitions/:id/delete') do
     end
 end
 
+# Deletes a competition and the related Horse-competitions-relations table with the specified table and then redirects to '/'
+#
+# @see Model#connect_db
 post('/competitions/:id/delete') do
     id = params[:id].to_i
     db = connect_db("db/horse_data.db")
@@ -162,6 +157,7 @@ post('/competitions/:id/delete') do
     redirect('/')
 end
 
+# Checks if user is admin otherwise redirects to '/error' and displays a specified error messege
 before('/competitions/:id/edit') do
     if session[:role] != 2 
         session[:error_messege] = "Du har inte behörighet för att göra detta"
@@ -169,16 +165,23 @@ before('/competitions/:id/edit') do
     end
 end
 
+# Displays the edit form for a specified competition
+#
+# @param [Integer] id, The id of the competition
+#
+# @see Model#connect_db
 get('/competitions/:id/edit') do
     id = params[:id].to_i
     db = connect_db("db/horse_data.db")
     e_result = db.execute("SELECT * FROM Competitions WHERE id = ?", id)
-    p e_result
-    p e_result[0]["id"]
     h_names = db.execute("SELECT name FROM Horses")
     slim(:"/competitions/edit",locals:{edit_comp:e_result, horse_names:h_names})
 end
 
+# Checks if user is admin and if any fields are empty otherwise redirects to '/error' and displays a specified error messege
+#
+# @param [String] place_comp, The place/name of the competition
+# @param [String] date_comp, The specified date of the competition  
 before('/competitions/:id/update') do
     if session[:role] != 2 
         session[:error_messege] = "Du har inte behörighet för att göra detta"
@@ -190,7 +193,21 @@ before('/competitions/:id/update') do
     end
 end
 
-
+# Updates a specified competition and the related Horse-competitions-relations table and then redirects to '/'
+#
+# @param [Integer] id, The id of the competition
+# @param [String] place_comp, The place/name of the competition
+# @param [String] date_comp, The specified date of the competition  
+# @param [String] select_winner, The name of the horse that was selected as the winner 
+# @param [String] select_2nd, The name of the horse that was selected as coming 2nd
+# @param [String] select_3nd, The name of the horse that was selected as coming 3rd
+# @param [String] select_4nd, The name of the horse that was selected as coming 4th
+# @param [String] select_5nd, The name of the horse that was selected as coming 5th
+# @param [String] select_6nd, The name of the horse that was selected as coming 6th
+# @param [String] select_7nd, The name of the horse that was selected as coming 7th
+# @param [String] select_8nd, The name of the horse that was selected as coming 8th
+#
+# @see Model#connect_db
 post('/competitions/:id/update') do
     id = params[:id]
     place = params[:place_comp]
@@ -208,8 +225,6 @@ post('/competitions/:id/update') do
     db.execute("DELETE FROM HCR WHERE competition_id = ?", id)
     db.results_as_hash = false
     comp_r = db.execute("SELECT id, winner, p2, p3, p4, p5, p6, p7, p8 FROM Competitions WHERE id = ?", id)
-    p comp_r
-    p comp_r[0].length
     x = 1
     while x < comp_r[0].length
         horse_id = db.execute("SELECT id FROM Horses WHERE name = ?", comp_r[0][x])
@@ -228,6 +243,7 @@ post('/competitions/:id/update') do
     redirect('/')
 end
 
+# Checks if user is admin otherwise redirects to '/error' and displays a specified error messege
 before('/competitions/end_season') do
     if session[:role] != 2 
         session[:error_messege] = "Du har inte behörighet för att göra detta"
@@ -235,6 +251,9 @@ before('/competitions/end_season') do
     end
 end
 
+# Ends the season which deletes all competitions and related enteties. It also adds the the win and loss count of every user into their t_wins and t_losses columns. 1 is added to titles for the owner and the horse that has the highest and then redirects to '/'
+#
+# @see Model#connect_db
 post('/competitions/end_season') do 
     db = connect_db("db/horse_data.db")
     standing_horses = session[:s_horses]
@@ -260,6 +279,9 @@ post('/competitions/end_season') do
     redirect("/")
 end
 
+# Displays the standings page
+#
+# @see Model#connect_db
 get('/standings') do
     db = connect_db("db/horse_data.db")
     standing_horses = db.execute("SELECT * FROM v_StandingsHorses")
@@ -268,6 +290,9 @@ get('/standings') do
     slim(:"standings", locals:{h_stand:standing_horses, o_stand:standing_owners})
 end
 
+# Displays the user page for a logged in user with a specified id, The user table and the users horses is displayed
+#
+# @see Model#connect_db
 get('/user') do
     user_id = session[:user_id]
     db = connect_db("db/horse_data.db")
@@ -281,9 +306,9 @@ get('/user') do
     if user_result["n_horses"] != 0 && user_result["n_horses"] != nil && rank.first != nil
 
         season_result = season_result.first.merge(rank.first)
-        p t_wins = user_result["t_wins"] + season_result["t_wins"]
-        p t_losses = user_result["t_losses"] + season_result["t_losses"]
-        p horse_results = db.execute("SELECT id, Horses.name, weight, height, titles, wins, losses, points, norank FROM Horses INNER JOIN v_StandingsHorses on v_StandingsHorses.name = Horses.name WHERE Horses.owner_id = ?", user_id)
+        t_wins = user_result["t_wins"] + season_result["t_wins"]
+        t_losses = user_result["t_losses"] + season_result["t_losses"]
+        horse_results = db.execute("SELECT id, Horses.name, weight, height, titles, wins, losses, points, norank FROM Horses INNER JOIN v_StandingsHorses on v_StandingsHorses.name = Horses.name WHERE Horses.owner_id = ?", user_id)
         i = user_result["n_horses"]-1
         j = horse_results.length-1
         j_saved = j
@@ -303,8 +328,6 @@ get('/user') do
             if horse_exists == true
                 horse_exists = false
             else
-                p horse_info[i]
-                p i
                 rookie_horse = {
                     "id" => horse_info[i]["id"],
                     "name" => horse_info[i]["name"],
@@ -354,18 +377,25 @@ get('/user') do
         session[:n_horses] = 0
         slim(:"user/index", locals:{season_r:season_result, horse_result:horse_results, user_result:user_result, twins:t_wins, tlosses:t_losses})
     end
-
-
 end
 
+# Displays the register form
 get('/register') do
     slim(:"register")
 end
 
+# Displays the register confirm page where a confirmation messege is displayed
 get('/register_confirm') do
     slim(:"register_confirm")
 end
 
+# Creates a new user and redirects to '/register_confirm'
+#
+# @param [String] username, The username
+# @param [String] password, The password
+# @param [String] password, The password_confirmation
+#
+# @see Model#login
 post('/user/new') do 
     username = params[:username]
     password = params[:password]
@@ -417,6 +447,18 @@ post('/horses/new') do
     redirect('/user')
 end
 
+# Checks if user is the owner of the horse otherwise redirects to '/error' and displays a specified error messege
+#
+# @param [Integer] id, The id of the horse
+before('/horses/:id/delete') do
+    db = connect_db("db/horse_data.db")
+    horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
+    if session[:user_id] != horse_owner.first["owner_id"]
+        session[:error_messege] = "Du äger inte denna hästen"
+        redirect('/error')
+    end
+end
+
 post('/horses/:id/delete') do
     id = params[:id].to_i
     db = connect_db("db/horse_data.db")
@@ -424,11 +466,35 @@ post('/horses/:id/delete') do
     redirect('/user')
 end
 
+# Checks if user is the owner of the horse otherwise redirects to '/error' and displays a specified error messege
+#
+# @param [Integer] id, The id of the horse
+before('/horses/:id/edit') do
+    db = connect_db("db/horse_data.db")
+    horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
+    if session[:user_id] != horse_owner.first["owner_id"]
+        session[:error_messege] = "Du äger inte denna hästen"
+        redirect('/error')
+    end
+end
+
 get('/horses/:id/edit') do
     id = params[:id].to_i
     db = connect_db("db/horse_data.db")
     h_result = db.execute("SELECT * FROM Horses WHERE id = ?", id)
     slim(:"/horses/edit",locals:{horse:h_result})
+end
+
+# Checks if user is the owner of the horse otherwise redirects to '/error' and displays a specified error messege
+#
+# @param [Integer] id, The id of the horse
+before('/horses/:id/update') do
+    db = connect_db("db/horse_data.db")
+    horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
+    if session[:user_id] != horse_owner.first["owner_id"]
+        session[:error_messege] = "Du äger inte denna hästen"
+        redirect('/error')
+    end
 end
 
 post('/horses/:id/update') do
@@ -446,18 +512,15 @@ post('/log_in') do
     db = connect_db("db/horse_data.db")
     username = params[:username]
     password = params[:password]
-    p session[:cooldown_check]
     if session[:cooldown_check] == nil
         session[:timearray] = []
         session[:cooldown] = false
         session[:cooldown_check] = true
     end
-    p session[:timearray]
     result = db.execute("SELECT id, password FROM User WHERE username = ?", username)
     if session[:cooldown] == false
         if session[:timearray].length > 4
             session[:timearray].delete_at[0]
-            p session[:timearray]
         end
         if password_cooldown_detection(session[:timearray]) != false
             session[:time] = password_cooldown_detection(session[:timearray])
@@ -465,8 +528,6 @@ post('/log_in') do
         end
     end
     if session[:cooldown] == true
-        p "Här inne"
-        p password_cooldown_counter(session[:time])
         if password_cooldown_counter(session[:time])
             session[:cooldown] = false
             session[:timearray] = []
@@ -482,9 +543,9 @@ post('/log_in') do
         session[:error_messege] = "användaren exsisterar inte"
         redirect("/error")
     end
-    p user_id = result.first["id"]
-    p password_digest = result.first["password"]
-    p BCrypt::Password.new(password_digest) == password
+    user_id = result.first["id"]
+    password_digest = result.first["password"]
+    BCrypt::Password.new(password_digest) == password
 
     if BCrypt::Password.new(password_digest) == password
         session[:user_id] = user_id
@@ -503,6 +564,7 @@ get('/error') do
     slim(:"error")
 end
 
+# Checks if user is logged in (has role of owner or admin) otherwise redirects to '/error' and displays a specified error messege
 before('/log_out') do
     if session[:role] != 1 && session[:role] != 2
         session[:error_messege] = "Du kan inte logga ut om du inte är inloggad"

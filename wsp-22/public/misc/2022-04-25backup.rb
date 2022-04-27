@@ -435,14 +435,14 @@ post('/horses/:id/delete') do
     redirect('/user')
 end
 
-# before('/horses/:id/edit') do
-    # db = connect_db("db/horse_data.db")
-    # horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
-    # if session[:user_id] != horse_owner
-    #     session[:error_messege] = "Du äger inte denna hästen"
-    #     redirect('/error')
-    # end
-# end
+before('/horses/:id/edit') do
+    db = connect_db("db/horse_data.db")
+    horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
+    if session[:user_id] != horse_owner.first["owner_id"]
+        session[:error_messege] = "Du äger inte denna hästen"
+        redirect('/error')
+    end
+end
 
 get('/horses/:id/edit') do
     id = params[:id].to_i
@@ -451,14 +451,14 @@ get('/horses/:id/edit') do
     slim(:"/horses/edit",locals:{horse:h_result})
 end
 
-# before('/horses/:id/update') do
-    # db = connect_db("db/horse_data.db")
-    # horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
-    # if session[:user_id] != horse_owner
-    #     session[:error_messege] = "Du äger inte denna hästen"
-    #     redirect('/error')
-    # end
-# end
+before('/horses/:id/update') do
+    db = connect_db("db/horse_data.db")
+    horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
+    if session[:user_id] != horse_owner.first["owner_id"]
+        session[:error_messege] = "Du äger inte denna hästen"
+        redirect('/error')
+    end
+end
 
 post('/horses/:id/update') do
     id = params[:id]
