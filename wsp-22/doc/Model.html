@@ -103,7 +103,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#connect_db-instance_method" title="#connect_db (instance method)">#<strong>connect_db</strong>(path)  &#x21d2; Object </a>
+      <a href="#competitions_f-instance_method" title="#competitions_f (instance method)">#<strong>competitions_f</strong>  &#x21d2; hash </a>
     
 
     
@@ -117,7 +117,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'>
+<p>Returns all data from table competitions as a hash.</p>
+</div></span>
   
 </li>
 
@@ -125,7 +127,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#password_cooldown_counter-instance_method" title="#password_cooldown_counter (instance method)">#<strong>password_cooldown_counter</strong>(cooldown)  &#x21d2; Object </a>
+      <a href="#connect_db-instance_method" title="#connect_db (instance method)">#<strong>connect_db</strong>(path)  &#x21d2; Database </a>
     
 
     
@@ -139,7 +141,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'>
+<p>Connects and imports database of a specified path and sets the results as hash.</p>
+</div></span>
   
 </li>
 
@@ -147,7 +151,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#password_cooldown_detection-instance_method" title="#password_cooldown_detection (instance method)">#<strong>password_cooldown_detection</strong>(timearray)  &#x21d2; Object </a>
+      <a href="#horses_f-instance_method" title="#horses_f (instance method)">#<strong>horses_f</strong>  &#x21d2; hash </a>
     
 
     
@@ -161,7 +165,9 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'>
+<p>Returns all data from table horses as a hash.</p>
+</div></span>
   
 </li>
 
@@ -169,7 +175,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#validate_digits-instance_method" title="#validate_digits (instance method)">#<strong>validate_digits</strong>(input)  &#x21d2; Object </a>
+      <a href="#password_cooldown_counter-instance_method" title="#password_cooldown_counter (instance method)">#<strong>password_cooldown_counter</strong>(cooldown)  &#x21d2; true, false </a>
     
 
     
@@ -183,7 +189,33 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'>
+<p>Checks if the current time is 30 seconds past when the cooldown was issued.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#password_cooldown_detection-instance_method" title="#password_cooldown_detection (instance method)">#<strong>password_cooldown_detection</strong>(timearray)  &#x21d2; Integer, false </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Checks if the time between the users last three logins is more than 30 seconds apart if so returns the time.</p>
+</div></span>
   
 </li>
 
@@ -198,28 +230,149 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="connect_db-instance_method">
+  <h3 class="signature first" id="competitions_f-instance_method">
   
-    #<strong>connect_db</strong>(path)  &#x21d2; <tt>Object</tt> 
-  
-
+    #<strong>competitions_f</strong>  &#x21d2; <tt>hash</tt> 
   
 
   
-</h3><table class="source_code">
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns all data from table competitions as a hash</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>all data from competitions</p>
+<ul><li>
+<p>:id [Integer] The ID of the horse</p>
+</li><li>
+<p>:name [String] The name of the horse</p>
+</li><li>
+<p>:date [String] The date of the horse</p>
+</li><li>
+<p>:winner [String] The name of the winner of the competition</p>
+</li><li>
+<p>:p2 [String] The name of the horse in p2</p>
+</li><li>
+<p>:p3 [String] The name of the horse in p3</p>
+</li><li>
+<p>:p4 [String] The name of the horse in p4</p>
+</li><li>
+<p>:p5 [String] The name of the horse in p5</p>
+</li><li>
+<p>:p6 [String] The name of the horse in p6</p>
+</li><li>
+<p>:p7 [String] The name of the horse in p7</p>
+</li><li>
+<p>:p8 [String] The name of the horse in p8</p>
+</li></ul>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-3
-4
-5
-6
-7</pre>
+70
+71
+72
+73
+74
+75</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'model.rb', line 3</span>
+      <pre class="code"><span class="info file"># File 'model.rb', line 70</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_competitions_f'>competitions_f</span>
+    <span class='id identifier rubyid_db'>db</span> <span class='op'>=</span> <span class='id identifier rubyid_connect_db'><span class='object_link'><a href="#connect_db-instance_method" title="Model#connect_db (method)">connect_db</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>db/horse_data.db</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_db'>db</span><span class='period'>.</span><span class='id identifier rubyid_results_as_hash'>results_as_hash</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_db'>db</span><span class='period'>.</span><span class='id identifier rubyid_execute'>execute</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>SELECT * FROM Competitions</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_result'>result</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="connect_db-instance_method">
+  
+    #<strong>connect_db</strong>(path)  &#x21d2; <tt>Database</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Connects and imports database of a specified path and sets the results as hash</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Database</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>containing the data of the database with the specified path</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+6
+7
+8
+9
+10</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'model.rb', line 6</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_connect_db'>connect_db</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_db'>db</span> <span class='op'>=</span> <span class='const'>SQLite3</span><span class='op'>::</span><span class='const'>Database</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
@@ -232,30 +385,155 @@
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="password_cooldown_counter-instance_method">
+  <h3 class="signature " id="horses_f-instance_method">
   
-    #<strong>password_cooldown_counter</strong>(cooldown)  &#x21d2; <tt>Object</tt> 
-  
-
+    #<strong>horses_f</strong>  &#x21d2; <tt>hash</tt> 
   
 
   
-</h3><table class="source_code">
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns all data from table horses as a hash</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>all data from horses</p>
+<ul><li>
+<p>:id [Integer] The ID of the horse</p>
+</li><li>
+<p>:name [String] The name of the horse</p>
+</li><li>
+<p>:weight [String] The date of the horse</p>
+</li><li>
+<p>:height [String] The height of the horse</p>
+</li><li>
+<p>:titles [Integer] The number of titles of the horse</p>
+</li><li>
+<p>:owner_id [Integer] The id of the horses owner</p>
+</li></ul>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-28
-29
-30
-31
-32
-33
-34</pre>
+49
+50
+51
+52
+53
+54</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'model.rb', line 28</span>
+      <pre class="code"><span class="info file"># File 'model.rb', line 49</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_horses_f'>horses_f</span>
+    <span class='id identifier rubyid_db'>db</span> <span class='op'>=</span> <span class='id identifier rubyid_connect_db'><span class='object_link'><a href="#connect_db-instance_method" title="Model#connect_db (method)">connect_db</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>db/horse_data.db</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_db'>db</span><span class='period'>.</span><span class='id identifier rubyid_results_as_hash'>results_as_hash</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_db'>db</span><span class='period'>.</span><span class='id identifier rubyid_execute'>execute</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>SELECT * FROM Horses</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_result'>result</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="password_cooldown_counter-instance_method">
+  
+    #<strong>password_cooldown_counter</strong>(cooldown)  &#x21d2; <tt>true</tt>, <tt>false</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Checks if the current time is 30 seconds past when the cooldown was issued</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>true</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if the time since cooldown is more than 30 seconds</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>false</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if the time since cooldown is less than 30 seconds</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+32
+33
+34
+35
+36
+37
+38</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'model.rb', line 32</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_password_cooldown_counter'>password_cooldown_counter</span><span class='lparen'>(</span><span class='id identifier rubyid_cooldown'>cooldown</span><span class='rparen'>)</span>
     <span class='kw'>if</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>-</span> <span class='id identifier rubyid_cooldown'>cooldown</span> <span class='op'>&gt;</span> <span class='int'>30</span>
@@ -272,13 +550,58 @@
       <div class="method_details ">
   <h3 class="signature " id="password_cooldown_detection-instance_method">
   
-    #<strong>password_cooldown_detection</strong>(timearray)  &#x21d2; <tt>Object</tt> 
+    #<strong>password_cooldown_detection</strong>(timearray)  &#x21d2; <tt>Integer</tt>, <tt>false</tt> 
   
 
   
 
   
-</h3><table class="source_code">
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Checks if the time between the users last three logins is more than 30 seconds apart if so returns the time</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The current time</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>false</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if the time between the users last three logins is more than 30 seconds</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
@@ -315,48 +638,12 @@
 </table>
 </div>
     
-      <div class="method_details ">
-  <h3 class="signature " id="validate_digits-instance_method">
-  
-    #<strong>validate_digits</strong>(input)  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-9
-10
-11
-12
-13
-14</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'model.rb', line 9</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_validate_digits'>validate_digits</span><span class='lparen'>(</span><span class='id identifier rubyid_input'>input</span><span class='rparen'>)</span>
-
-    <span class='id identifier rubyid_answer'>answer</span> <span class='op'>=</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_scan'>scan</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\D</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> 
-
-    <span class='kw'>return</span> <span class='id identifier rubyid_answer'>answer</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
   </div>
 
 </div>
 
       <div id="footer">
-  Generated on Wed Apr 27 10:16:33 2022 by
+  Generated on Thu Apr 28 23:22:15 2022 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.27 (ruby-3.0.3).
 </div>

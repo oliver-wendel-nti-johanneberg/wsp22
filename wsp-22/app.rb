@@ -9,6 +9,7 @@ enable :sessions
 include Model
 
 # Checks if user is logged in (Has role admin(2) or role owner(1)). If user is not logged in an error messege is displayed if user tries to request a route not specified below.
+#
 before do 
     if (session[:role] != 1 && session[:role] != 2) && request.path_info != ('/') && request.path_info != ('/standings') && request.path_info != ('/error') && request.path_info != ('/register') && request.path_info != ('/log_in') && request.path_info != ('/user/new') && request.path_info != ('/register_confirm')
     session[:error_messege] = "Du har inte behörighet till denna sidan"
@@ -139,6 +140,7 @@ end
 
 
 # Checks if user is admin otherwise redirects to '/error' and displays a specified error messege
+#
 before('/competitions/:id/delete') do
     if session[:role] != 2 
         session[:error_messege] = "Du har inte behörighet för att göra detta"
@@ -158,6 +160,7 @@ post('/competitions/:id/delete') do
 end
 
 # Checks if user is admin otherwise redirects to '/error' and displays a specified error messege
+#
 before('/competitions/:id/edit') do
     if session[:role] != 2 
         session[:error_messege] = "Du har inte behörighet för att göra detta"
@@ -244,6 +247,7 @@ post('/competitions/:id/update') do
 end
 
 # Checks if user is admin otherwise redirects to '/error' and displays a specified error messege
+#
 before('/competitions/end_season') do
     if session[:role] != 2 
         session[:error_messege] = "Du har inte behörighet för att göra detta"
@@ -380,11 +384,13 @@ get('/user') do
 end
 
 # Displays the register form
+#
 get('/register') do
     slim(:"register")
 end
 
 # Displays the register confirm page where a confirmation messege is displayed
+#
 get('/register_confirm') do
     slim(:"register_confirm")
 end
@@ -395,7 +401,7 @@ end
 # @param [String] password, The password
 # @param [String] password, The password_confirmation
 #
-# @see Model#login
+# @see Model#connect_db
 post('/user/new') do 
     username = params[:username]
     password = params[:password]
@@ -424,10 +430,15 @@ post('/user/new') do
     end
 end
 
+# Displays the form for adding a new horse
+#
 get('/horses/new') do
     slim(:"/horses/new")
 end
 
+# Checks if user is logged in otherwise redirects to '/error' and displays a specified error messege
+#
+# @param [Integer] user_id, The id of the logged in user
 before('/horses/new') do
     if session[:user_id] == nil
         session[:error_messege] = "Du är inte inloggad"
@@ -435,6 +446,11 @@ before('/horses/new') do
     end
 end
 
+# Creates a new horse and redirects to '/user'
+#
+# @param [String] name_horse, The name of the horse
+# @param [Integer] weight_horse, The weight of the horse
+# @param [Integer] height_horse, The height of the horse
 post('/horses/new') do
     owner_id = session[:user_id]
     name = params[:name_horse]
@@ -450,6 +466,8 @@ end
 # Checks if user is the owner of the horse otherwise redirects to '/error' and displays a specified error messege
 #
 # @param [Integer] id, The id of the horse
+#
+# @see Model#connect_db
 before('/horses/:id/delete') do
     db = connect_db("db/horse_data.db")
     horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
@@ -459,6 +477,11 @@ before('/horses/:id/delete') do
     end
 end
 
+# Deletes a specified horse and then redirects to '/user'
+#
+# @param [Integer] id, The id of the horse
+#
+# @see Model#connect_db
 post('/horses/:id/delete') do
     id = params[:id].to_i
     db = connect_db("db/horse_data.db")
@@ -469,6 +492,8 @@ end
 # Checks if user is the owner of the horse otherwise redirects to '/error' and displays a specified error messege
 #
 # @param [Integer] id, The id of the horse
+#
+# @see Model#connect_db
 before('/horses/:id/edit') do
     db = connect_db("db/horse_data.db")
     horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
@@ -478,6 +503,11 @@ before('/horses/:id/edit') do
     end
 end
 
+# Displays the edit form for a specified horse
+#
+# @param [Integer] id, The id of the horse
+#
+# @see Model#connect_db
 get('/horses/:id/edit') do
     id = params[:id].to_i
     db = connect_db("db/horse_data.db")
@@ -488,6 +518,8 @@ end
 # Checks if user is the owner of the horse otherwise redirects to '/error' and displays a specified error messege
 #
 # @param [Integer] id, The id of the horse
+#
+# @see Model#connect_db
 before('/horses/:id/update') do
     db = connect_db("db/horse_data.db")
     horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
@@ -497,6 +529,14 @@ before('/horses/:id/update') do
     end
 end
 
+# Updates a specified horse and then redirects to '/user'
+#
+# @param [Integer] id, The id of the horse
+# @param [String] name_horse, The name of the horse
+# @param [Integer] weight_horse, The weight of the horse
+# @param [Integer] height_horse, The height of the horse
+#
+# @see Model#connect_db
 post('/horses/:id/update') do
     id = params[:id]
     name = params[:name_horse]
@@ -507,7 +547,14 @@ post('/horses/:id/update') do
     redirect('/user')
 end
 
-
+# Attempts to login and if succesful updates the correlating sessions and redirects to '/user'. If not succefull it redirects and displays a specified error messege. If user is unsucceful 3 times within 30 seconds a cooldown of 30 seconds is activated and a corresponding error messege is displayed if the user tries to log in again.
+#
+# @param [String] username, The username
+# @param [String] password, The password
+#
+# @see Model#password_cooldown_detection
+# @see Model#password_cooldown_counter
+# @see Model#connect_db
 post('/log_in') do 
     db = connect_db("db/horse_data.db")
     username = params[:username]
@@ -560,11 +607,14 @@ post('/log_in') do
     end
 end
 
+# Displays an error page with a previosly specified error messege
+#
 get('/error') do
     slim(:"error")
 end
 
 # Checks if user is logged in (has role of owner or admin) otherwise redirects to '/error' and displays a specified error messege
+#
 before('/log_out') do
     if session[:role] != 1 && session[:role] != 2
         session[:error_messege] = "Du kan inte logga ut om du inte är inloggad"
@@ -572,6 +622,8 @@ before('/log_out') do
     end
 end
 
+# Deletes all sessions and redirects to ('/')
+#
 post('/log_out') do
     session.destroy
     redirect("/")
