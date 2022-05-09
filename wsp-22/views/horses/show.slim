@@ -1,0 +1,19 @@
+- show_horse.each do |horse| 
+    article.horse_stats#horse_stats_1
+        div.horse_stats_1
+            h2 = horse["name"]
+            h3 #{horse["weight"]} kg
+            h3 #{horse["height"]} cm
+            h3 Mästerskap: #{horse["titles"]}
+        div.input_horse
+            form method="post" action="horses/#{horse['id']}/delete"
+                input type="submit" value="Ta bort"
+            form method="get" action="horses/#{horse['id']}/edit"
+                input type="submit" value="Uppdatera"
+        div.horse_stats_2
+            h2 Aktuell säsong
+            h3 Vinster: #{horse["wins"]}
+            h3 Förluster: #{horse["losses"]}
+            h3 Poäng: #{horse["points"]}
+            h3 Ranking: #{horse["norank"]}
+a.start_button#error_button href="/" Gå tillbaka till startsida

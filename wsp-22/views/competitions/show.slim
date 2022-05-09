@@ -1,0 +1,33 @@
+- show_comp.each do |comp|
+        section.section_start#section_comp_start 
+            article.article_start#article_1_start 
+                h3.comp_name #{comp["name"]}
+                h3.comp_date #{comp["date"]}
+                div.comp_div
+                    form method="post" action="competitions/#{comp['id']}/delete"
+                        input type="submit" value="Ta bort"
+                    form method="get" action="competitions/#{comp['id']}/edit"
+                        input type="submit" value="Uppdatera"
+            article.article_start#article_2_start 
+                table.table_start 
+                    tr
+                        td.row_1_st Vinnare 
+                        td #{comp["winner"]} 
+                        td 5: plats 
+                        td #{comp["p5"]}
+                    tr 
+                        td.row_1_st 2: plats
+                        td #{comp["p2"]} 
+                        td 6: plats 
+                        td #{comp["p6"]} 
+                    tr 
+                        td.row_1_st 3: plats 
+                        td #{comp["p3"]}
+                        td 7: plats 
+                        td #{comp["p7"]}
+                    tr
+                        td.row_1_st 4: plats 
+                        td #{comp["p4"]}
+                        td 8: plats 
+                        td #{comp["p8"]} 
+a.start_button#error_button href="/" Gå tillbaka till startsida
