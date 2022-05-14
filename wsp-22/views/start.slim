@@ -5,7 +5,7 @@ main.main_wrapper_start
         h3 Namn: #{session[:username]}
         h3 Ranking: #{session[:ranking]}
         h3 Antal hästar: #{session[:n_horses]}
-        a.start_button href="/user" se profil 
+        a.start_button href="/profile" se profil 
     section.section_start#section_lcomp_start 
         - s_comp = competitions.last
         h2 Senaste tävlingen: #{s_comp["name"]}

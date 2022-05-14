@@ -38,14 +38,12 @@ end
 # @see Model#competitions_f
 # @see Model#horses_f
 # @see Model#connect_db
-# @see Model#new_comp
-# @see Model#user_id_f
-# @see Model#horses_names
-# @see Model#s_horses_limited
-# @see Model#s_owners_limited
 get('/') do
+    db = connect_db("db/horse_data.db")
     r_competitions = competitions_f
     if r_competitions.empty?
+        db = SQLite3::Database.new("db/horse_data.db")
+        db.results_as_hash = true
         horses = horses_f
         name = "placeholder"
         date = "placeholder_date"
@@ -57,13 +55,27 @@ get('/') do
         p6 = horses[5]["name"]
         p7 = horses[6]["name"]
         p8 = horses[7]["name"]
-
-        new_comp(name, date, winner, p2, p3, p4, p5, p6, p7, p8)
-
+        db.execute("INSERT INTO Competitions (name, date, winner, p2, p3, p4, p5, p6, p7, p8) VALUES (?,?,?,?,?,?,?,?,?,?)", name, date, winner, p2, p3, p4, p5, p6, p7, p8)
+        db.results_as_hash = false
+        comp_r = db.execute("SELECT id, winner, p2, p3, p4, p5, p6, p7, p8 FROM Competitions WHERE id = (SELECT MAX (id) FROM Competitions)")
+        x = 1
+        while x < comp_r[0].length
+            horse_id = db.execute("SELECT id FROM Horses WHERE name = ?", comp_r[0][x])
+            competition_id = comp_r[0][0]
+            pos_id = x
+            if pos_id == 1
+                win = 1
+            else
+                win = 0
+            end
+            points = db.execute("SELECT pts FROM Points WHERE id = ?", pos_id)
+            db.execute("INSERT INTO HCR (horse_id, competition_id, pos_id, points, win) VALUES (?,?,?,?,?)", horse_id, competition_id, pos_id, points, win)
+            x += 1
+        end
         redirect("/")
     end
 
-    r_user =  user_id_f( session[:user_id]).first
+    r_user = db.execute("SELECT * FROM User WHERE id = ?", session[:user_id]).first
     if r_user == nil
         r_user = {
             "username" => "Not logged in"
@@ -73,9 +85,9 @@ get('/') do
     end
 
     r_competitions = competitions_f
-    h_names = horse_names
-    v_standingHorses = s_horses_limited
-    v_standingOwners = s_owners_limited
+    h_names = db.execute("SELECT name FROM Horses")
+    v_standingHorses = db.execute("SELECT * FROM v_StandingsHorses LIMIT 3;")
+    v_standingOwners = db.execute("SELECT * FROM v_StandingsOwners LIMIT 3;")
     slim(:start, locals:{competitions:r_competitions, horse_names:h_names, standing_horses:v_standingHorses, standing_owners:v_standingOwners, user:r_user})
 end
 
@@ -84,15 +96,12 @@ end
 #
 # @param [String] place_comp, The place/name of the competition
 # @param [String] date_comp, The specified date of the competition  
-#
-# @see Model#check_empty
 before('/competitions') do
     if session[:role] != 2 
         session[:error_messege] = "Du har inte behörighet för att göra detta"
         redirect('/error')
     end
-    if check_empty([params[:place_comp], params[:date_comp]])
-    
+    if params[:place_comp].empty? || params[:date_comp].empty?
         session[:error_messege] = "Fel input"
         redirect('/error')
     end
@@ -111,8 +120,6 @@ end
 # @param [String] select_6nd, The name of the horse that was selected as coming 6th
 # @param [String] select_7nd, The name of the horse that was selected as coming 7th
 # @param [String] select_8nd, The name of the horse that was selected as coming 8th
-#
-# @see Model#new_comp
 post('/competitions') do
     place = params[:place_comp]
     date = params[:date_comp]
@@ -142,7 +149,7 @@ end
 
 # Deletes a competition and the related Horse-competitions-relations table with the specified table and then redirects to '/'
 #
-# @see Model#delete_comp
+# @see Model#connect_db
 post('/competitions/:id/delete') do
     id = params[:id].to_i
     delete_comp(id)
@@ -162,11 +169,11 @@ end
 #
 # @param [Integer] id, The id of the competition
 #
-# @see Model#comp_id_f
-# @see Model#horses_names
+# @see Model#connect_db
 get('/competitions/:id/edit') do
     id = params[:id].to_i
-    e_result = comp_id_f(id)
+    db = connect_db("db/horse_data.db")
+    e_result = db.execute("SELECT * FROM Competitions WHERE id = ?", id)
     h_names = horse_names
     slim(:"/competitions/edit",locals:{edit_comp:e_result, horse_names:h_names})
 end
@@ -180,8 +187,8 @@ before('/competitions/:id/update') do
         session[:error_messege] = "Du har inte behörighet för att göra detta"
         redirect('/error')
     end
-    if check_empty([params[:place_comp], params[:date_comp]])
-        session[:error_messege] = "Inga tomma fält i forms"
+    if params[:place_comp].empty? || params[:date_comp].empty?
+        session[:error_messege] = "Fel input"
         redirect('/error')
     end
 end
@@ -200,7 +207,7 @@ end
 # @param [String] select_7nd, The name of the horse that was selected as coming 7th
 # @param [String] select_8nd, The name of the horse that was selected as coming 8th
 #
-# @see Model#update_comp
+# @see Model#connect_db
 post('/competitions/:id/update') do
     id = params[:id]
     place = params[:place_comp]
@@ -213,8 +220,25 @@ post('/competitions/:id/update') do
     select_6th = params[:select_6th]
     select_7th = params[:select_7th]
     select_8th = params[:select_8th]
-
-    update_comp(place, date, winner, select_2nd, select_3rd, select_4th, select_5th, select_6th, select_7th, select_8th, id)
+    db = connect_db("db/horse_data.db")
+    db.execute("UPDATE competitions SET name=?,date=?,winner=?,p2=?,p3=?,p4=?,p5=?,p6=?,p7=?,p8=? WHERE id = ?", place, date, winner, select_2nd, select_3rd, select_4th, select_5th, select_6th, select_7th, select_8th, id)
+    db.execute("DELETE FROM HCR WHERE competition_id = ?", id)
+    db.results_as_hash = false
+    comp_r = db.execute("SELECT id, winner, p2, p3, p4, p5, p6, p7, p8 FROM Competitions WHERE id = ?", id)
+    x = 1
+    while x < comp_r[0].length
+        horse_id = db.execute("SELECT id FROM Horses WHERE name = ?", comp_r[0][x])
+        competition_id = comp_r[0][0]
+        pos_id = x
+        if pos_id == 1
+            win = 1
+        else
+            win = 0
+        end
+        points = db.execute("SELECT pts FROM Points WHERE id = ?", pos_id)
+        db.execute("INSERT INTO HCR (horse_id, competition_id, pos_id, points, win) VALUES (?,?,?,?,?)", horse_id, competition_id, pos_id, points, win)
+        x += 1
+    end
 
     redirect('/')
 end
@@ -223,10 +247,11 @@ end
 #
 # @param [Integer] id, The id of the competition
 #
-# @see Model#comp_id_f
+# @see Model#connect_db
 get('/competitions/:id') do
+    db = connect_db("db/horse_data.db")
     id = params[:id].to_i
-    comp_result = comp_id_f(id)
+    comp_result = db.execute("SELECT * FROM Competitions WHERE id = ?", id)
     slim(:"/competitions/show",locals:{show_comp:comp_result})
 end
 
@@ -241,35 +266,54 @@ end
 
 # Ends the season which deletes all competitions and related enteties. It also adds the the win and loss count of every user into their t_wins and t_losses columns. 1 is added to titles for the owner and the horse that has the highest and then redirects to '/'
 #
-# @see Model#end_season
+# @see Model#connect_db
 post('/competitions/end_season') do 
-    end_season()
+    db = connect_db("db/horse_data.db")
+    standing_horses = session[:s_horses]
+    standing_owners = session[:s_owners]
+    season_winner_horses = db.execute("SELECT id, titles FROM Horses WHERE name = (SELECT name FROM v_StandingsHorses WHERE norank = 1)")
+    season_winner_owners = db.execute("SELECT id, titles FROM User WHERE username = (SELECT username FROM v_StandingsOwners WHERE norank = 1)")
+    h_titles = season_winner_horses.first["titles"] + 1
+    o_titles = season_winner_owners.first["titles"] + 1
+    db.execute("UPDATE Horses SET titles=? WHERE id = ?", h_titles, season_winner_horses.first["id"])
+    db.execute("UPDATE User SET titles=? WHERE id = ?", o_titles, season_winner_owners.first["id"])
+    season_result_owners = db.execute("SELECT username, wins, losses FROM v_StandingsOwners")
+    i = 0
+    while i < season_result_owners.length  
+    user = db.execute("SELECT * FROM User WHERE username = ?", season_result_owners[i]["username"])
+    t_wins = season_result_owners[i]["wins"] + user.first["t_wins"] 
+    t_losses = season_result_owners[i]["losses"] + user.first["t_losses"]
+    db.execute("UPDATE User SET t_wins=?,t_losses=? WHERE id = ?", t_wins, t_losses, user.first["id"])
+    i +=1
+    end
+    db.execute("DELETE FROM Competitions")
+    db.execute("DELETE FROM HCR")
+
     redirect("/")
 end
 
 # Displays the standings page
 #
-# @see Model#s_horses
-# @see Model#s_owners
+# @see Model#connect_db
 get('/standings') do
-    standing_horses = s_horses
-    standing_owners = s_owners
+    db = connect_db("db/horse_data.db")
+    standing_horses = db.execute("SELECT * FROM v_StandingsHorses")
+    standing_owners = db.execute("SELECT * FROM v_StandingsOwners")
+    session[:s_horses] = standing_owners
     slim(:"standings", locals:{h_stand:standing_horses, o_stand:standing_owners})
 end
 
 # Displays the user page for a logged in user with a specified id, The user table and the users horses is displayed
 #
-# @see Model#user_info
-# @see Model#horse_result
+# @see Model#connect_db
 get('/profile') do
     user_id = session[:user_id]
-    username = session[:username]
-    profile_info = user_info(user_id, username)
-    horse_info = profile_info[0]
-    user_result = profile_info[1]
-    season_result = profile_info[2]
-    rank = profile_info[3]
-    n_horses = profile_info[4]
+    db = connect_db("db/horse_data.db")
+    horse_info = db.execute("SELECT * FROM Horses WHERE owner_id = ?", user_id)
+    user_result = db.execute("SELECT * FROM User WHERE id = ?", user_id)
+    season_result = db.execute("SELECT (count(win)-sum(win)) AS t_losses ,sum(points) AS t_points, sum(win) AS t_wins FROM HCR inner join Horses on Horses.id = HCR.horse_id WHERE Horses.owner_id = ?", user_id)
+    rank = db.execute("SELECT norank FROM v_StandingsOwners WHERE username = ?", session[:username]) 
+    n_horses = db.execute("SELECT COUNT(id) AS n_horses FROM Horses WHERE owner_id = ?", user_id)
     user_result = user_result.first.merge(n_horses.first)
 
     if user_result["n_horses"] != 0 && user_result["n_horses"] != nil && rank.first != nil
@@ -277,7 +321,7 @@ get('/profile') do
         season_result = season_result.first.merge(rank.first)
         t_wins = user_result["t_wins"] + season_result["t_wins"]
         t_losses = user_result["t_losses"] + season_result["t_losses"]
-        horse_results = horse_result(user_id)
+        horse_results = db.execute("SELECT id, Horses.name, weight, height, titles, wins, losses, points, norank FROM Horses INNER JOIN v_StandingsHorses on v_StandingsHorses.name = Horses.name WHERE Horses.owner_id = ?", user_id)
         i = user_result["n_horses"]-1
         j = horse_results.length-1
         j_saved = j
@@ -361,7 +405,7 @@ get('/register_confirm') do
 end
 
 before('/user') do
-    if check_empty([params[:username], params[:password], params[:password_confirm]])
+    if params[:username].empty? || params[:password].empty? || params[:password_confirm].empty?
         session[:error_messege] = "Tomma fält i formuläret"
         redirect('/error')
     end
@@ -373,9 +417,7 @@ end
 # @param [String] password, The password
 # @param [String] password, The password_confirmation
 #
-# @see Model#check_if_logged
-# @see Model#new_user
-# @see Model#create_password
+# @see Model#connect_db
 post('/user') do 
     username = params[:username]
     password = params[:password]
@@ -385,12 +427,13 @@ post('/user') do
     t_wins = 0
     t_losses = 0
 
-    check_result = check_if_logged(username)
+    db = connect_db("db/horse_data.db")
+    check_result = db.execute("SELECT id FROM User WHERE username = ?", username)
 
     if check_result.empty?
         if password == password_confirm
-            password_digest = create_password(password)
-            check_result = new_user(username, password_digest, role, t_wins, t_losses, titles)
+            password_digest = BCrypt::Password.create(password)
+            check_result = db.execute("INSERT INTO User (username, password, role, t_wins, t_losses, titles) VALUES (?,?,?,?,?,?)", username, password_digest, role, t_wins, t_losses, titles)
             session[:error_messege] = username
             redirect('/register_confirm')
         else
@@ -408,8 +451,23 @@ end
 # @see Model#connect_db
 # @see Model#horses_f
 get('/horses/') do
+    db = connect_db("db/horse_data.db")
     horse_result = horses_f
     slim(:"/horses/index",locals:{horse_r:horse_result})
+end
+
+# Shows a horse with a specified id
+#
+# @param [Integer] id, The id of the horse
+#
+# @see Model#connect_db
+get('/horses/:id') do
+    db = connect_db("db/horse_data.db")
+    id = params[:id].to_i
+    p id
+    horse_result = db.execute("SELECT * FROM Horses WHERE id = ?", id)
+    p horse_result
+    slim(:"/horses/show",locals:{show_horse:horse_result})
 end
 
 # Displays the form for adding a new horse
@@ -418,28 +476,15 @@ get('/horses/new') do
     slim(:"/horses/new")
 end
 
-# Shows a horse with a specified id
-#
-# @param [Integer] id, The id of the horse
-#
-# @see Model#horse_id_f
-get('/horses/:id') do
-    id = params[:id].to_i
-    horse_result = horse_id_f(id)
-    slim(:"/horses/show",locals:{show_horse:horse_result})
-end
-
 # Checks if user is logged in otherwise redirects to '/error' and displays a specified error messege
 #
 # @param [Integer] user_id, The id of the logged in user
-#
-# @see Model#check_empty
 before('/horses') do
     if session[:user_id] == nil
         session[:error_messege] = "Du är inte inloggad"
         redirect('/error')
     end
-    if check_empty([params[:name_horse], params[:weight_horse], params[:height_horse]])
+    if params[:name_horse].empty? || params[:weight_horse].empty? || params[:height_horse].empty?
         session[:error_messege] = "Tomma fält i formuläret"
         redirect('/error')
     end
@@ -450,15 +495,15 @@ end
 # @param [String] name_horse, The name of the horse
 # @param [Integer] weight_horse, The weight of the horse
 # @param [Integer] height_horse, The height of the horse
-#
-# @see Model#new_horse
 post('/horses') do
     owner_id = session[:user_id]
     name = params[:name_horse]
     weight = params[:weight_horse]
     height = params[:height_horse]
     titles = 0
-    new_horse(owner_id, name, weight, height, titles)
+    db = SQLite3::Database.new("db/horse_data.db")
+    db.results_as_hash = false
+    db.execute("INSERT INTO Horses (name, weight, height, titles, owner_id) VALUES (?,?,?,?,?)", name, weight, height, titles, owner_id)
     redirect('/')
 end
 
@@ -466,9 +511,10 @@ end
 #
 # @param [Integer] id, The id of the horse
 #
-# @see Model#horse_owner_f
+# @see Model#connect_db
 before('/horses/:id/delete') do
-    horse_owner = horse_owner_f(params[:id])
+    db = connect_db("db/horse_data.db")
+    horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
     if session[:user_id] != horse_owner.first["owner_id"]
         session[:error_messege] = "Du äger inte denna hästen"
         redirect('/error')
@@ -479,10 +525,11 @@ end
 #
 # @param [Integer] id, The id of the horse
 #
-# @see Model#delete_horse
+# @see Model#connect_db
 post('/horses/:id/delete') do
     id = params[:id].to_i
-    delete_horse(id)
+    db = connect_db("db/horse_data.db")
+    db.execute("DELETE FROM Horses WHERE id = ?", id)
     redirect('/profile')
 end
 
@@ -490,9 +537,10 @@ end
 #
 # @param [Integer] id, The id of the horse
 #
-# @see Model#horse_owner_f
+# @see Model#connect_db
 before('/horses/:id/edit') do
-    horse_owner = horse_owner_f(params[:id])
+    db = connect_db("db/horse_data.db")
+    horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
     if session[:user_id] != horse_owner.first["owner_id"]
         session[:error_messege] = "Du äger inte denna hästen"
         redirect('/error')
@@ -503,10 +551,11 @@ end
 #
 # @param [Integer] id, The id of the horse
 #
-# @see Model#horse_id_f
+# @see Model#connect_db
 get('/horses/:id/edit') do
     id = params[:id].to_i
-    h_result = horse_id_f(id)
+    db = connect_db("db/horse_data.db")
+    h_result = db.execute("SELECT * FROM Horses WHERE id = ?", id)
     slim(:"/horses/edit",locals:{horse:h_result})
 end
 
@@ -514,15 +563,15 @@ end
 #
 # @param [Integer] id, The id of the horse
 #
-# @see Model#horse_owner_f
-# @see Model#check_empty
+# @see Model#connect_db
 before('/horses/:id/update') do
-    horse_owner = horse_owner_f(params[:id])
+    db = connect_db("db/horse_data.db")
+    horse_owner = db.execute("SELECT owner_id FROM Horses WHERE id = ?", params[:id])
     if session[:user_id] != horse_owner.first["owner_id"]
         session[:error_messege] = "Du äger inte denna hästen"
         redirect('/error')
     end
-    if check_empty([params[:name_horse], params[:weight_horse], params[:height_horse]])
+    if params[:name_horse].empty? || params[:weight_horse].empty? || params[:height_horse].empty?
         session[:error_messege] = "Tomma fält i formuläret"
         redirect('/error')
     end
@@ -535,13 +584,14 @@ end
 # @param [Integer] weight_horse, The weight of the horse
 # @param [Integer] height_horse, The height of the horse
 #
-# @see Model#update_horse
+# @see Model#connect_db
 post('/horses/:id/update') do
     id = params[:id]
     name = params[:name_horse]
     weight = params[:weight_horse]
     height = params[:height_horse]
-    update_horse(id, name, weight, height)
+    db = connect_db("db/horse_data.db")
+    db.execute("UPDATE Horses SET name=?,weight=?,height=? WHERE id = ?", name, weight, height, id)
     redirect('/profile')
 end
 
@@ -552,10 +602,9 @@ end
 #
 # @see Model#password_cooldown_detection
 # @see Model#password_cooldown_counter
-# @see Model#check_empty
-# @see Model#user_name_f
-# @see Model#check_password
+# @see Model#connect_db
 post('/log_in') do 
+    db = connect_db("db/horse_data.db")
     username = params[:username]
     password = params[:password]
     if session[:cooldown_check] == nil
@@ -563,11 +612,11 @@ post('/log_in') do
         session[:cooldown] = false
         session[:cooldown_check] = true
     end
-    if check_empty([params[:username], params[:password]])
+    if params[:username].empty? || params[:password].empty?
         session[:error_messege] = "tomma fält i formuläret"
         redirect("/error")
     end
-    result = user_name_f(username)
+    result = db.execute("SELECT id, password FROM User WHERE username = ?", username)
     if session[:cooldown] == false
         if session[:timearray].length > 4
             session[:timearray].delete_at[0]
@@ -595,10 +644,11 @@ post('/log_in') do
     end
     user_id = result.first["id"]
     password_digest = result.first["password"]
+    BCrypt::Password.new(password_digest) == password
 
-    if check_password(password_digest, password)
+    if BCrypt::Password.new(password_digest) == password
         session[:user_id] = user_id
-        session[:role] = user_id_f(user_id).first["role"]
+        session[:role] = db.execute("SELECT role FROM User WHERE id = ?", user_id).first["role"]
         session[:username] = username
         redirect("/profile")
     else
