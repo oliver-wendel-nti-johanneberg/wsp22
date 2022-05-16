@@ -37,7 +37,6 @@ end
 #
 # @see Model#competitions_f
 # @see Model#horses_f
-# @see Model#connect_db
 # @see Model#new_comp
 # @see Model#user_id_f
 # @see Model#horses_names
@@ -405,7 +404,6 @@ end
 
 # Shows all horses from the horses table
 #
-# @see Model#connect_db
 # @see Model#horses_f
 get('/horses/') do
     horse_result = horses_f
